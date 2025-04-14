@@ -20,18 +20,16 @@ function index(req, res) {
    
  
 function show(req, res) {
-    console.log(req.params);
+    const id = req.params.id;
+    const sql = 'SELECT * FROM posts WHERE id = ?';
 
-    const postSlug = req.params.slug;
-    const post = posts.find(post => post.slug === postSlug);
-    if (!post) {
-        return res.status(404).json({
-            error: 404,
-            message: "post not found"
-        });
-    }
-
-    res.json(post);
+    connection.query(sql, [id], (err, results) => {
+        if (err) {
+            console.error('Error executing query:', err.stack);
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.json({ message: 'Post richiesto:', results });
+    });
 }
 
 
@@ -82,18 +80,5 @@ function destroy(req, res) {
         res.json({ message: 'Post deleted successfully', results });
     });
 }
-/* {
-    const postSlug = req.params.slug;
-    const post = posts.find(post => post.slug === postSlug);
-    if (!post) {
-        return res.status(404).json({
-            error: 404,
-            message: "post not found"
-        });
-    }
-    posts.splice(posts.indexOf(post), 1);
-    res.json(posts);
 
-}
- */
 module.exports = ({ index, show, create, edit, update, destroy });
