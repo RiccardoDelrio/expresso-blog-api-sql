@@ -18,20 +18,44 @@ function index(req, res) {
 
 
    
- 
 function show(req, res) {
     const id = req.params.id;
-    const sql = 'SELECT * FROM posts WHERE id = ?';
-
-    connection.query(sql, [id], (err, results) => {
+    
+    // Prima query per ottenere il post
+    const sqlPost = 'SELECT * FROM posts WHERE id = ?';
+    
+    connection.query(sqlPost, [id], (err, postResults) => {
         if (err) {
             console.error('Error executing query:', err.stack);
             return res.status(500).json({ error: 'Database error' });
         }
-        res.json({ message: 'Post richiesto:', results });
+
+        if (postResults.length === 0) {
+            return res.status(404).json({ error: 'Post not found' });
+        }
+
+        const post = postResults[0];
+
+        // Seconda query per ottenere i tags
+        const sqlTags = `
+            SELECT tags.label 
+            FROM tags 
+            JOIN post_tag ON tags.id = post_tag.tag_id 
+            WHERE post_tag.post_id = ?`;
+
+        connection.query(sqlTags, [id], (err, tagResults) => {
+            if (err) {
+                console.error('Error executing query:', err.stack);
+                return res.status(500).json({ error: 'Database error' });
+            }
+
+            // Aggiungi i tags al post come array
+            post.tags = tagResults.map(tag => tag.label);
+            
+            res.json(post);
+        });
     });
 }
-
 
 function create(req, res) {
     res.send('Aggiunta di un nuovo post');
