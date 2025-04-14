@@ -6,6 +6,6 @@ router.get('/:slug', postControllers.show)
 router.post('/', postControllers.create)//STORE
 router.put('/:slug', postControllers.edit)
 router.patch('/:slug', postControllers.update)
-router.delete('/:slug', postControllers.destroy)
+router.delete('/:id', postControllers.destroy)
 
 module.exports = router

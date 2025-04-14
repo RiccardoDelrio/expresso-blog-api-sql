@@ -3,7 +3,7 @@ const connection = require('../data/db');
 
 function index(req, res) {
 
-    const sql= 'SELECT * FROM pizzas'
+    const sql= 'SELECT * FROM posts';
     connection.query(sql, (err, results) => {
         if (err) {
             console.error('Error executing query:', err.stack);
@@ -71,6 +71,18 @@ function update(req, res) {
     console.log(posts);
 }
 function destroy(req, res) {
+    const id = req.params.id;
+    const sql = 'DELETE FROM posts WHERE id = ?';
+
+    connection.query(sql, [id], (err, results) => {
+        if (err) {
+            console.error('Error executing query:', err.stack);
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.json({ message: 'Post deleted successfully', results });
+    });
+}
+/* {
     const postSlug = req.params.slug;
     const post = posts.find(post => post.slug === postSlug);
     if (!post) {
@@ -83,5 +95,5 @@ function destroy(req, res) {
     res.json(posts);
 
 }
-
+ */
 module.exports = ({ index, show, create, edit, update, destroy });
